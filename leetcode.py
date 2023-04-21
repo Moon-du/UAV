@@ -160,5 +160,5 @@ class Leetcode:
 
 
 if __name__ == "__main__":
-    a = Leetcode().searchInsert([1, 3, 5, 6], 0)
+    a = Leetcode().searchInsert([1, 3, 5, 7], 0)
     print(a)
