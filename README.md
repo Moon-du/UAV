@@ -23,7 +23,7 @@
 
 - MPU6050
 
-    - MPU6050.VCC \t-> STM32.3.3V
+    - MPU6050.VCC \t -> STM32.3.3V
 
     - MPU6050.GND \t-> STM32.GND
 
