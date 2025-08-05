@@ -3,35 +3,35 @@
 #include "gpio.h"
 
 /*------------- 用户根据原理图修改的宏 -------------*/
-/* 第 1 片 TB6612 (M1A/M1B) */
-#define PWMA_TIM    &htim3
+/* 第 1 片 TB6612 (MA/MB) */
+#define PWMA_TIM    &htim1
 #define PWMA_CH     TIM_CHANNEL_1
 #define AIN1_Port   GPIOA
 #define AIN1_Pin    GPIO_PIN_0
 #define AIN2_Port   GPIOA
 #define AIN2_Pin    GPIO_PIN_1
 
-#define PWMB_TIM    &htim3
+#define PWMB_TIM    &htim1
 #define PWMB_CH     TIM_CHANNEL_2
 #define BIN1_Port   GPIOA
 #define BIN1_Pin    GPIO_PIN_2
 #define BIN2_Port   GPIOA
 #define BIN2_Pin    GPIO_PIN_3
 
-/* 第 2 片 TB6612 (M2A/M2B) */
-#define PWMA2_TIM   &htim3
-#define PWMA2_CH    TIM_CHANNEL_3
-#define AIN1_2_Port GPIOA
-#define AIN1_2_Pin  GPIO_PIN_4
-#define AIN2_2_Port GPIOA
-#define AIN2_2_Pin  GPIO_PIN_5
+/* 第 2 片 TB6612 (MC/MD) */
+#define PWMC_TIM   &htim1
+#define PWMC_CH    TIM_CHANNEL_3
+#define CIN1_Port  GPIOA
+#define CIN1_Pin   GPIO_PIN_4
+#define CIN2_Port  GPIOA
+#define CIN2_Pin   GPIO_PIN_5
 
-#define PWMB2_TIM   &htim3
-#define PWMB2_CH    TIM_CHANNEL_4
-#define BIN1_2_Port GPIOA
-#define BIN1_2_Pin  GPIO_PIN_6
-#define BIN2_2_Port GPIOA
-#define BIN2_2_Pin  GPIO_PIN_7
+#define PWMD_TIM   &htim1
+#define PWMD_CH    TIM_CHANNEL_4
+#define DIN1_Port  GPIOA
+#define DIN1_Pin   GPIO_PIN_6
+#define DIN2_Port  GPIOA
+#define DIN2_Pin   GPIO_PIN_7
 
 #define MAX_SPEED   100
 
@@ -68,8 +68,8 @@ void TB6612_Init(void)
     /* 启动所有 PWM 通道 */
     HAL_TIM_PWM_Start(PWMA_TIM, PWMA_CH);
     HAL_TIM_PWM_Start(PWMB_TIM, PWMB_CH);
-    HAL_TIM_PWM_Start(PWMA2_TIM, PWMA2_CH);
-    HAL_TIM_PWM_Start(PWMB2_TIM, PWMB2_CH);
+    HAL_TIM_PWM_Start(PWMC_TIM, PWMC_CH);
+    HAL_TIM_PWM_Start(PWMD_TIM, PWMD_CH);
 
     /* GPIO 方向脚已在 CubeMX 配置为推挽输出，无需额外初始化 */
 }
@@ -79,25 +79,24 @@ void TB6612_SetMotor(MotorId id, MotorDir dir, uint8_t speed)
     if (speed > MAX_SPEED) speed = MAX_SPEED;
 
     switch (id) {
-    case MOTOR_A: /* 第 1 片 M1A */
+    case MOTOR_A: /* 第 1 片 MA */
         __SetPwm(PWMA_TIM, PWMA_CH, speed);
         __SetDir(AIN1_Port, AIN1_Pin, AIN2_Port, AIN2_Pin, dir);
         break;
 
-    case MOTOR_B: /* 第 1 片 M1B */
+    case MOTOR_B: /* 第 1 片 MB */
         __SetPwm(PWMB_TIM, PWMB_CH, speed);
         __SetDir(BIN1_Port, BIN1_Pin, BIN2_Port, BIN2_Pin, dir);
         break;
 
-    /* 扩展：MotorId 继续增加即可，下面给出示范 */
-    case 2: /* 第 2 片 M2A */
-        __SetPwm(PWMA2_TIM, PWMA2_CH, speed);
-        __SetDir(AIN1_2_Port, AIN1_2_Pin, AIN2_2_Port, AIN2_2_Pin, dir);
+    case MOTOR_C: /* 第 2 片 MC */
+        __SetPwm(PWMC_TIM, PWMC_CH, speed);
+        __SetDir(CIN1_Port, CIN1_Pin, CIN2_Port, CIN2_Pin, dir);
         break;
 
-    case 3: /* 第 2 片 M2B */
-        __SetPwm(PWMB2_TIM, PWMB2_CH, speed);
-        __SetDir(BIN1_2_Port, BIN1_2_Pin, BIN2_2_Port, BIN2_2_Pin, dir);
+    case MOTOR_D: /* 第 2 片 MD */
+        __SetPwm(PWMD_TIM, PWMD_CH, speed);
+        __SetDir(DIN1_Port, DIN1_Pin, DIN2_Port, DIN2_Pin, dir);
         break;
 
     default:
