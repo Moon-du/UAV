@@ -1,3 +1,11 @@
+/*
+ * tb6612.c
+ *
+ *  Created on: Aug 5, 2025
+ *      Author: yingzhuang.feng
+ */
+
+
 #include "tb6612.h"
 #include "tim.h"
 #include "gpio.h"
@@ -34,6 +42,7 @@
 #define DIN2_Pin   GPIO_PIN_3
 
 #define MAX_SPEED   100
+#define MIN_SPEED   0
 
 /*------------- 内部静态函数 -------------*/
 static inline void __SetPwm(TIM_HandleTypeDef *tim, uint32_t ch, uint8_t spd)
@@ -77,6 +86,7 @@ void TB6612_Init(void)
 void TB6612_SetMotor(MotorId id, MotorDir dir, uint8_t speed)
 {
     if (speed > MAX_SPEED) speed = MAX_SPEED;
+    if (speed < MIN_SPEED) speed = MIN_SPEED;
 
     switch (id) {
     case MOTOR_A: /* 第 1 片 MA */
@@ -106,10 +116,10 @@ void TB6612_SetMotor(MotorId id, MotorDir dir, uint8_t speed)
 
 void TB6612_Brake(MotorId id)
 {
-    TB6612_SetMotor(id, DIR_STOP, 100);   /* PWM=100，方向脚同时为高 -> 刹车 */
+    TB6612_SetMotor(id, DIR_STOP, MAX_SPEED);   /* PWM=100，方向脚同时为高 -> 刹车 */
 }
 
 void TB6612_Coast(MotorId id)
 {
-    TB6612_SetMotor(id, DIR_STOP, 0);     /* PWM=0，方向脚为低 -> 滑行 */
+    TB6612_SetMotor(id, DIR_STOP, MIN_SPEED);     /* PWM=0，方向脚为低 -> 滑行 */
 }
