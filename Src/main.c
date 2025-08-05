@@ -21,6 +21,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -29,6 +30,7 @@
 #include "oled.h"
 #include "mpu6050.h"
 #include "madgwick.h"
+#include "tb6612.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -134,9 +136,12 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   MX_TIM3_Init();
+  MX_TIM1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_Delay(20);
   OLED_Init();
+  TB6612_Init();
 
   // 初始化MPU6050
   if (MPU6050_Init()){
@@ -185,6 +190,20 @@ int main(void)
 		  Madgwick_Update(&filter,
 						  mpu6050.Gx, mpu6050.Gy, mpu6050.Gz,
 						  mpu6050.Ax, mpu6050.Ay, mpu6050.Az);
+
+		  /* 电机 0（M1A）正转 50% 速度 */
+		  TB6612_SetMotor(0, DIR_CW, 50);
+		  /* 电机 1（M1B）反转 50% 速度 */
+		  TB6612_SetMotor(1, DIR_CCW, 50);
+		  /* 电机 2（M2A）正转 50% 速度 */
+		  TB6612_SetMotor(2, DIR_CW, 50);
+		  /* 电机 3（M2A）反转 50% 速度 */
+		  TB6612_SetMotor(3, DIR_CCW, 50);
+		  /* 刹车 */
+//		  TB6612_Brake(0);
+		  /* 滑行 */
+//		  TB6612_Coast(0);
+
 	  }
 
 	  // 20Hz更新显示
