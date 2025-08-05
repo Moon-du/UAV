@@ -5,33 +5,33 @@
 /*------------- 用户根据原理图修改的宏 -------------*/
 /* 第 1 片 TB6612 (MA/MB) */
 #define PWMA_TIM    &htim1
-#define PWMA_CH     TIM_CHANNEL_1
+#define PWMA_CH     TIM_CHANNEL_1    /* PA8 */
 #define AIN1_Port   GPIOA
-#define AIN1_Pin    GPIO_PIN_0
+#define AIN1_Pin    GPIO_PIN_4
 #define AIN2_Port   GPIOA
-#define AIN2_Pin    GPIO_PIN_1
+#define AIN2_Pin    GPIO_PIN_5
 
 #define PWMB_TIM    &htim1
-#define PWMB_CH     TIM_CHANNEL_2
+#define PWMB_CH     TIM_CHANNEL_2    /* PA9 */
 #define BIN1_Port   GPIOA
-#define BIN1_Pin    GPIO_PIN_2
+#define BIN1_Pin    GPIO_PIN_6
 #define BIN2_Port   GPIOA
-#define BIN2_Pin    GPIO_PIN_3
+#define BIN2_Pin    GPIO_PIN_7
 
 /* 第 2 片 TB6612 (MC/MD) */
 #define PWMC_TIM   &htim1
-#define PWMC_CH    TIM_CHANNEL_3
-#define CIN1_Port  GPIOA
-#define CIN1_Pin   GPIO_PIN_4
-#define CIN2_Port  GPIOA
-#define CIN2_Pin   GPIO_PIN_5
+#define PWMC_CH    TIM_CHANNEL_3    /* PA10 */
+#define CIN1_Port  GPIOB
+#define CIN1_Pin   GPIO_PIN_0
+#define CIN2_Port  GPIOB
+#define CIN2_Pin   GPIO_PIN_1
 
 #define PWMD_TIM   &htim1
-#define PWMD_CH    TIM_CHANNEL_4
-#define DIN1_Port  GPIOA
-#define DIN1_Pin   GPIO_PIN_6
-#define DIN2_Port  GPIOA
-#define DIN2_Pin   GPIO_PIN_7
+#define PWMD_CH    TIM_CHANNEL_4    /* PA11 */
+#define DIN1_Port  GPIOB
+#define DIN1_Pin   GPIO_PIN_2
+#define DIN2_Port  GPIOB
+#define DIN2_Pin   GPIO_PIN_3
 
 #define MAX_SPEED   100
 
