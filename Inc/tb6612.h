@@ -9,6 +9,8 @@
 typedef enum {
     MOTOR_A = 0,   /**< 第 1 路电机(M1) */
     MOTOR_B = 1    /**< 第 2 路电机(M2) */
+    MOTOR_C = 2,   /**< 第 3 路电机(M1) */
+    MOTOR_D = 3    /**< 第 4 路电机(M2) */
 } MotorId;
 
 /**
