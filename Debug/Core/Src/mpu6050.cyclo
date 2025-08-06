@@ -1,0 +1,4 @@
+../Core/Src/mpu6050.c:14:9:MPU6050_Init	2
+../Core/Src/mpu6050.c:46:6:MPU6050_Read_All_DMA	1
+../Core/Src/mpu6050.c:52:6:MPU6050_Process_Data	1
+../Core/Src/mpu6050.c:82:6:MPU6050_Calibrate	2

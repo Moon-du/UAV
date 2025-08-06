@@ -1,0 +1,6 @@
+../Core/Src/tb6612.c:49:20:__SetPwm	128	static
+../Core/Src/tb6612.c:56:20:__SetDir	24	static
+../Core/Src/tb6612.c:78:6:TB6612_Init	8	static
+../Core/Src/tb6612.c:89:6:TB6612_SetMotor	24	static
+../Core/Src/tb6612.c:120:6:TB6612_Brake	16	static
+../Core/Src/tb6612.c:125:6:TB6612_Coast	16	static
