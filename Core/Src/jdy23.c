@@ -1,83 +1,93 @@
 #include "jdy23.h"
 #include <string.h>
-#include <stdlib.h>
+#include <stdio.h>
+
+/* ---------------- 内部变量 ---------------- */
+static uint8_t  rx_dma_buf[2][JDY23_RX_BUF_LEN];  // 双缓冲
+static uint8_t  rx_idle_buf[JDY23_FRAME_MAX];
+static uint16_t rx_idle_len = 0;
 
 JDY23_Command_t jdy23_cmd = {0};
-uint8_t jdy23_rx_buffer[JDY23_RX_BUFFER_SIZE];
 
-// 初始化蓝牙模块
-void JDY23_Init(void) {
-    // 重置指令结构体
+/* ---------------- 对外接口 ---------------- */
+void JDY23_Init(void)
+{
     JDY23_ResetCommand();
 
-    // 启动DMA接收
-    HAL_UART_Receive_DMA(&huart2, jdy23_rx_buffer, JDY23_RX_BUFFER_SIZE);
-    __HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT); // 禁用半传输中断
+    /* 启动双缓冲 DMA + 空闲中断 */
+    HAL_UARTEx_ReceiveToIdle_DMA(&huart2, rx_dma_buf[0], JDY23_RX_BUF_LEN);
+    __HAL_DMA_DISABLE_IT(&hdma_usart2_rx, DMA_IT_HT);   // 关 Half-Transfer
 }
 
-// 重置指令为安全值
-void JDY23_ResetCommand(void) {
+void JDY23_ResetCommand(void)
+{
     jdy23_cmd.throttle = 0;
-    jdy23_cmd.roll = 0;
-    jdy23_cmd.pitch = 0;
-    jdy23_cmd.yaw = 0;
+    jdy23_cmd.roll     = 0;
+    jdy23_cmd.pitch    = 0;
+    jdy23_cmd.yaw      = 0;
 }
 
-// 检查指令超时
-void JDY23_CheckTimeout(void) {
-    if (HAL_GetTick() - jdy23_cmd.last_update > JDY23_CMD_TIMEOUT) {
-        JDY23_ResetCommand();  // 超时后重置指令
+void JDY23_CheckTimeout(void)
+{
+    if (HAL_GetTick() - jdy23_cmd.last_update > JDY23_CMD_TIMEOUT)
+        JDY23_ResetCommand();
+}
+
+/* ---------------- 内部解析 ---------------- */
+static void parse_frame(uint8_t *frame, uint16_t len)
+{
+    /* 安全终止 */
+    if (len >= JDY23_FRAME_MAX) len = JDY23_FRAME_MAX - 1;
+    frame[len] = '\0';
+
+    int   t; float r, p, y;
+    if (sscanf((char *)frame, "T%dR%fP%fY%f", &t, &r, &p, &y) == 4)
+    {
+        /* 范围检查 */
+        if (t < 0 || t > 100) return;
+        if (r < -30.0f || r > 30.0f) return;
+        if (p < -30.0f || p > 30.0f) return;
+        if (y < -20.0f || y > 20.0f) return;
+
+        /* 写入全局结构体（乘 100 转定点） */
+        jdy23_cmd.throttle   = t * 100;
+        jdy23_cmd.roll       = (int16_t)(r * 100.0f);
+        jdy23_cmd.pitch      = (int16_t)(p * 100.0f);
+        jdy23_cmd.yaw        = (int16_t)(y * 100.0f);
+        jdy23_cmd.last_update = HAL_GetTick();
     }
 }
 
-// 处理接收到的数据
-void JDY23_ProcessData(uint8_t *data, uint16_t size) {
-    // 查找帧头
-    for (int i = 0; i < size; i++) {
-        if (data[i] == 'T') {
-            // 查找帧尾
-            int end = i + 1;
-            while (end < size && data[end] != '\n') {
-                end++;
-            }
-            if (end < size) {
-                // 提取命令字符串
-                char command[end - i + 1];
-                memcpy(command, &data[i], end - i);
-                command[end - i] = '\0';
+/* ---------------- CubeIDE 回调 ---------------- */
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,
+                                uint16_t Size)
+{
+    if (huart->Instance == USART2)
+    {
+        /* 当前空闲中断所用缓冲区索引 */
+        static uint8_t buf_idx = 0;
+        uint8_t *buf = rx_dma_buf[buf_idx];
 
-                // 解析命令
-                char *token = strtok(command, "R");
-                if (token && token[0] == 'T') {
-                    jdy23_cmd.throttle = atoi(token + 1);
-
-                    token = strtok(NULL, "P");
-                    if (token) {
-                        jdy23_cmd.roll = atof(token);
-
-                        token = strtok(NULL, "Y");
-                        if (token) {
-                            jdy23_cmd.pitch = atof(token);
-
-                            token = strtok(NULL, "\n");
-                            if (token) {
-                                jdy23_cmd.yaw = atof(token);
-                            }
-                        }
-                    }
+        /* 找到完整 '\n' 帧 */
+        uint16_t start = 0;
+        for (uint16_t i = 0; i < Size; i++)
+        {
+            if (buf[i] == '\n')
+            {
+                uint16_t frame_len = i - start + 1;
+                if (frame_len <= JDY23_FRAME_MAX)
+                {
+                    memcpy(rx_idle_buf, &buf[start], frame_len);
+                    parse_frame(rx_idle_buf, frame_len);
                 }
-                jdy23_cmd.last_update = HAL_GetTick();
-                return;
+                start = i + 1;
             }
         }
+
+        /* 切换双缓冲 */
+        buf_idx ^= 1;
+        HAL_UARTEx_ReceiveToIdle_DMA(huart,
+                                     rx_dma_buf[buf_idx],
+                                     JDY23_RX_BUF_LEN);
     }
 }
-
-// DMA接收完成回调
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart->Instance == USART2) {
-        JDY23_ProcessData(jdy23_rx_buffer, JDY23_RX_BUFFER_SIZE);
-        HAL_UART_Receive_DMA(&huart2, jdy23_rx_buffer, JDY23_RX_BUFFER_SIZE);
-    }
-}
-
