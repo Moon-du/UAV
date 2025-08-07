@@ -5,7 +5,6 @@
 /* ---------------- 内部变量 ---------------- */
 static uint8_t  rx_dma_buf[2][JDY23_RX_BUF_LEN];  // 双缓冲
 static uint8_t  rx_idle_buf[JDY23_FRAME_MAX];
-static uint16_t rx_idle_len = 0;
 
 JDY23_Command_t jdy23_cmd = {0};
 
@@ -91,3 +90,4 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,
                                      JDY23_RX_BUF_LEN);
     }
 }
+
