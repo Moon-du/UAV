@@ -214,6 +214,12 @@ int main(void)
 		  // 检查蓝牙超时
 		  JDY23_CheckTimeout();
 
+		  /* 蓝牙指令（定点 int16×100）→ 浮点 */
+	          float target_throttle = jdy23_cmd.throttle / 100.0f;   // 0~100 %
+	          float target_roll     = jdy23_cmd.roll     / 100.0f;   // -30~30°
+	          float target_pitch    = jdy23_cmd.pitch    / 100.0f;
+	          float target_yaw      = jdy23_cmd.yaw      / 100.0f;
+
 		  // 计算PID控制量
 		  float pitch_output = PID_Calculate(&pitch_pid,  jdy23_cmd.pitch, current_pitch);
 		  float roll_output  = PID_Calculate(&roll_pid,  jdy23_cmd.roll,  current_roll);
@@ -345,3 +351,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
