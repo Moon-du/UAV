@@ -4,8 +4,6 @@
 #ifndef __JDY23_H
 #define __JDY23_H
 
-#include <stdint.h>
-
 #define JDY23_RX_BUF_LEN   128      // 环形缓冲区大小
 #define JDY23_FRAME_MAX    64       // 单帧最大长度
 #define JDY23_CMD_TIMEOUT  100      // ms, 无数据超时
@@ -27,3 +25,4 @@ void JDY23_CheckTimeout(void);
 void JDY23_ResetCommand(void);
 
 #endif
+
