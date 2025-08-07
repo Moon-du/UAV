@@ -238,6 +238,25 @@ int main(void)
 		  TB6612_SetMotor(2, DIR_CW, (uint8_t)motorC);
 		  /* 电机 3（MD）反转 */
 		  TB6612_SetMotor(3, DIR_CCW, (uint8_t)motorD);
+
+		  // 电池百分比
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "T:%2.1fC, B:%3d%%", mpu6050.Temp, battery_percent);
+
+		  // 目标姿态：R P Y
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "TRPY:%4.1f,%4.1f,%4.1f",
+				   target_roll, target_pitch, target_yaw);
+
+		  // 实际姿态：R P Y
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "CRPY:%4.1f,%4.1f,%4.1f",
+				   current_roll, current_pitch, current_yaw);
+
+		  // 电机占空比
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "M:%3d,%3d,%3d,%3d",
+				   (uint8_t)motorA, (uint8_t)motorB, (uint8_t)motorC, (uint8_t)motorD);
 	  }
 
 	  // 20Hz更新显示
@@ -249,14 +268,14 @@ int main(void)
 
 		  // 在OLED上显示姿态和温度
 		  OLED_NewFrame();
-		  snprintf(displayBuffer, sizeof(displayBuffer), "T:%2.1fC",mpu6050.Temp);
-		  OLED_PrintASCIIString(0, 1, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-		  snprintf(displayBuffer, sizeof(displayBuffer), "R:%4.1f", current_roll);
-		  OLED_PrintASCIIString(0, 11, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-		  snprintf(displayBuffer, sizeof(displayBuffer), "P:%4.1f", current_pitch);
-		  OLED_PrintASCIIString(0, 21, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-		  snprintf(displayBuffer, sizeof(displayBuffer), "Y:%4.1f", current_yaw);
-		  OLED_PrintASCIIString(0, 31, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+//		  snprintf(displayBuffer, sizeof(displayBuffer), "T:%2.1fC",mpu6050.Temp);
+//		  OLED_PrintASCIIString(0, 1, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+//		  snprintf(displayBuffer, sizeof(displayBuffer), "R:%4.1f", current_roll);
+//		  OLED_PrintASCIIString(0, 11, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+//		  snprintf(displayBuffer, sizeof(displayBuffer), "P:%4.1f", current_pitch);
+//		  OLED_PrintASCIIString(0, 21, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+//		  snprintf(displayBuffer, sizeof(displayBuffer), "Y:%4.1f", current_yaw);
+//		  OLED_PrintASCIIString(0, 31, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
 		  OLED_ShowFrame();
 	  }
 
