@@ -68,7 +68,10 @@ uint8_t battery_percent = 0; // 电池状态变量
 PID_Controller pitch_pid, roll_pid, yaw_pid;
 // 当前姿态
 float current_roll, current_pitch, current_yaw;
-
+// 目标姿态
+float target_throttle, target_roll, target_pitch, target_yaw;
+// 电机占空比
+float motorA, motorB, motorC, motorD;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -158,7 +161,7 @@ int main(void)
 
   // PID初始化
   PID_Init(&pitch_pid, 1.2f, 0.05f, 0.2f, 30.0f);  // PITCH PID参数
-  PID_Init(&roll_pid,  1.2f, 0.05f, 0.2f, 30.0f);   // ROLL PID参数
+  PID_Init(&roll_pid,  0.8f, 0.05f, 0.2f, 30.0f);   // ROLL PID参数
   PID_Init(&yaw_pid,   0.8f, 0.01f, 0.1f, 20.0f);   // YAW PID参数
 
   // 初始化MPU6050
@@ -215,10 +218,10 @@ int main(void)
 		  JDY23_CheckTimeout();
 
 		  /* 蓝牙指令（定点 int16×100）→ 浮点 */
-		  float target_throttle = jdy23_cmd.throttle / 100.0f;   // 0~100 %
-		  float target_roll     = jdy23_cmd.roll     / 100.0f;   // -30~30°
-		  float target_pitch    = jdy23_cmd.pitch    / 100.0f;
-		  float target_yaw      = jdy23_cmd.yaw      / 100.0f;
+		  target_throttle = jdy23_cmd.throttle / 100.0f;   // 0~100 %
+		  target_roll     = jdy23_cmd.roll     / 100.0f;   // -30~30°
+		  target_pitch    = jdy23_cmd.pitch    / 100.0f;
+		  target_yaw      = jdy23_cmd.yaw      / 100.0f;
 
 		  // 计算PID控制量
 		  float pitch_output = PID_Calculate(&pitch_pid,  target_roll, current_pitch);
@@ -226,7 +229,6 @@ int main(void)
 		  float yaw_output   = PID_Calculate(&yaw_pid,   target_yaw,   current_yaw);
 
 		  // 电机混控
-		  float motorA, motorB, motorC, motorD;
 		  Motor_Mixing(target_throttle, pitch_output, roll_output, yaw_output,
 		  					  &motorA, &motorB, &motorC, &motorD);
 
@@ -239,43 +241,36 @@ int main(void)
 		  /* 电机 3（MD）反转 */
 		  TB6612_SetMotor(3, DIR_CCW, (uint8_t)motorD);
 
-		  // 电池百分比
-		  snprintf(displayBuffer, sizeof(displayBuffer),
-				   "T:%2.1fC, B:%3d%%", mpu6050.Temp, battery_percent);
-
-		  // 目标姿态：R P Y
-		  snprintf(displayBuffer, sizeof(displayBuffer),
-				   "TRPY:%4.1f,%4.1f,%4.1f",
-				   target_roll, target_pitch, target_yaw);
-
-		  // 实际姿态：R P Y
-		  snprintf(displayBuffer, sizeof(displayBuffer),
-				   "CRPY:%4.1f,%4.1f,%4.1f",
-				   current_roll, current_pitch, current_yaw);
-
-		  // 电机占空比
-		  snprintf(displayBuffer, sizeof(displayBuffer),
-				   "M:%3d,%3d,%3d,%3d",
-				   (uint8_t)motorA, (uint8_t)motorB, (uint8_t)motorC, (uint8_t)motorD);
 	  }
 
 	  // 20Hz更新显示
 	  if (HAL_GetTick() - display_timer >= 50) {
 		  display_timer = HAL_GetTick();
 
-		  // 获取电量百分比
+//		   获取电量百分比
 		  battery_percent = Battery_GetPercentage();
 
-		  // 在OLED上显示姿态和温度
+//		   在OLED上显示姿态和温度
 		  OLED_NewFrame();
-//		  snprintf(displayBuffer, sizeof(displayBuffer), "T:%2.1fC",mpu6050.Temp);
-//		  OLED_PrintASCIIString(0, 1, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-//		  snprintf(displayBuffer, sizeof(displayBuffer), "R:%4.1f", current_roll);
-//		  OLED_PrintASCIIString(0, 11, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-//		  snprintf(displayBuffer, sizeof(displayBuffer), "P:%4.1f", current_pitch);
-//		  OLED_PrintASCIIString(0, 21, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
-//		  snprintf(displayBuffer, sizeof(displayBuffer), "Y:%4.1f", current_yaw);
-//		  OLED_PrintASCIIString(0, 31, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+		  // 温度 电池百分比
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "T:%2.1fC, B:%3d%%", mpu6050.Temp, battery_percent);
+		  OLED_PrintASCIIString(0, 1, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+		  // 目标姿态：R P Y
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "TRPY:%4.1f,%4.1f,%4.1f",
+				   target_roll, target_pitch, target_yaw);
+		  OLED_PrintASCIIString(0, 11, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+		  // 实际姿态：R P Y
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "CRPY:%4.1f,%4.1f,%4.1f",
+				   current_roll, current_pitch, current_yaw);
+		  OLED_PrintASCIIString(0, 21, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
+		  // 电机占空比
+		  snprintf(displayBuffer, sizeof(displayBuffer),
+				   "M:%3d,%3d,%3d,%3d",
+				   (uint8_t)motorA, (uint8_t)motorB, (uint8_t)motorC, (uint8_t)motorD);
+		  OLED_PrintASCIIString(0, 31, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
 		  OLED_ShowFrame();
 	  }
 
