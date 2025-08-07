@@ -4,22 +4,25 @@
 #ifndef __JDY23_H
 #define __JDY23_H
 
-#define JDY23_RX_BUFFER_SIZE 64
-#define JDY23_CMD_TIMEOUT 100  // 指令超时时间(ms)
+#include <stdint.h>
 
+#define JDY23_RX_BUF_LEN   128      // 环形缓冲区大小
+#define JDY23_FRAME_MAX    64       // 单帧最大长度
+#define JDY23_CMD_TIMEOUT  100      // ms, 无数据超时
+
+/* 控制命令结构体（全部用定点，乘 100） */
 typedef struct {
-    float throttle;  // 0-100%
-    float roll;      // -30 to 30度
-    float pitch;     // -30 to 30度
-    float yaw;       // -20 to 20度
-    uint32_t last_update; // 最后更新时间
+    int16_t  throttle;   // 0..10000   (0.00~100.00 %)
+    int16_t  roll;       // -3000..3000 (-30.00~30.00°)
+    int16_t  pitch;      // -3000..3000
+    int16_t  yaw;        // -2000..2000
+    uint32_t last_update;
 } JDY23_Command_t;
 
 extern JDY23_Command_t jdy23_cmd;
 extern DMA_HandleTypeDef hdma_usart2_rx;
 
 void JDY23_Init(void);
-void JDY23_ProcessData(uint8_t *data, uint16_t size);
 void JDY23_CheckTimeout(void);
 void JDY23_ResetCommand(void);
 
