@@ -23,6 +23,6 @@ extern DMA_HandleTypeDef hdma_usart2_rx;
 void JDY23_Init(void);
 void JDY23_CheckTimeout(void);
 void JDY23_ResetCommand(void);
+void JDY23_SendBattery(uint8_t percent);
 
 #endif
-
