@@ -247,10 +247,9 @@ int main(void)
 	  if (HAL_GetTick() - display_timer >= 50) {
 		  display_timer = HAL_GetTick();
 
-//		   获取电量百分比
+		  //获取电量百分比
 		  battery_percent = Battery_GetPercentage();
 
-//		   在OLED上显示姿态和温度
 		  OLED_NewFrame();
 		  // 温度 电池百分比
 		  snprintf(displayBuffer, sizeof(displayBuffer),
@@ -272,6 +271,9 @@ int main(void)
 				   (uint8_t)motorA, (uint8_t)motorB, (uint8_t)motorC, (uint8_t)motorD);
 		  OLED_PrintASCIIString(0, 31, displayBuffer, &afont8x6, OLED_COLOR_NORMAL);
 		  OLED_ShowFrame();
+
+		  // 发送电量信息到手机
+		  JDY23_SendBattery(battery_percent);
 	  }
 
 	  // 低功耗等待
