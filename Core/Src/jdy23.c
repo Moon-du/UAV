@@ -5,7 +5,10 @@
 /* ---------------- 内部变量 ---------------- */
 static uint8_t  rx_dma_buf[2][JDY23_RX_BUF_LEN];  // 双缓冲
 static uint8_t  rx_idle_buf[JDY23_FRAME_MAX];
-
+static uint8_t  tx_fifo[32];
+static volatile uint16_t tx_wr = 0;
+static volatile uint16_t tx_rd = 0;
+static volatile uint8_t  tx_busy = 0;
 JDY23_Command_t jdy23_cmd = {0};
 
 /* ---------------- 对外接口 ---------------- */
@@ -30,6 +33,34 @@ void JDY23_CheckTimeout(void)
 {
     if (HAL_GetTick() - jdy23_cmd.last_update > JDY23_CMD_TIMEOUT)
         JDY23_ResetCommand();
+}
+
+/* ----------------发送电量数据---------------------*/
+static void tx_start(void)
+{
+    if (tx_busy) return;
+    if (tx_rd == tx_wr) return;
+
+    uint16_t len = (tx_wr > tx_rd) ? (tx_wr - tx_rd)
+                                     : (sizeof(tx_fifo) - tx_rd);
+    tx_busy = 1;
+    HAL_UART_Transmit_IT(&huart2, &tx_fifo[tx_rd], len);
+}
+
+void JDY23_SendBattery(uint8_t percent)
+{
+    char tmp[16];
+    int len = snprintf(tmp, sizeof(tmp), "BAT%d%%\r\n", percent);
+
+    /* 拷贝到环形 FIFO（满就丢） */
+    for (int i = 0; i < len; ++i)
+    {
+        uint16_t next = (tx_wr + 1) % sizeof(tx_fifo);
+        if (next == tx_rd) return;   // FIFO 满
+        tx_fifo[tx_wr] = tmp[i];
+        tx_wr = next;
+    }
+    tx_start();      // 触发发送
 }
 
 /* ---------------- 内部解析 ---------------- */
@@ -90,4 +121,17 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart,
                                      JDY23_RX_BUF_LEN);
     }
 }
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART2)
+    {
+        tx_rd = (tx_rd + huart->TxXferSize) % sizeof(tx_fifo);
+        tx_busy = 0;
+        tx_start();          // 如果有剩余数据，继续发
+    }
+}
+
+
+
 
