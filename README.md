@@ -33,24 +33,89 @@
 
 - SSD1306
 
-    - SSD1306.GND -> STM32.GND
-
     - SSD1306.VCC -> STM32.3.3V
+
+    - SSD1306.GND -> STM32.GND
 
     - SSD1306.SCL -> STM32.PB10(I2C2_SCL)
 
     - SSD1306.SDA -> STM32.PB11(I2C2_SDA)
+ 
+- JDY23
 
-### STM32CubeIDE配置：
+    - JDY23.VCC -> STM32.3.3V
 
-- TIM3
+    - JDY23.GND -> STM32.GND
 
+    - JDY23.RX -> STM32.PA2(USART2_TX)
 
+    - JDY23.TX -> STM32.PA3(USART2_RX)
+      
+- TB6612_1
 
-- I2C1
+    - TB6612_1.VM  -> BATTARY.+
 
+    - TB6612_1.VCC -> STM32.3.3V
+     
+    - TB6612_1.GND -> STM32.GND
+ 
+    - TB6612_1.STBY -> STM32.PB8
+ 
+    - TB6612_1.PWMA -> STM32.PA8(TIM1_CHANNEL_1)
+ 
+    - TB6612_1.PWMB -> STM32.PA9(TIM1_CHANNEL_2)
 
+    - TB6612_1.AIN1 -> STM32.PA4
 
-- I2C2
+    - TB6612_1.AIN2 -> STM32.PA5
+    
+    - TB6612_1.BIN1 -> STM32.PA6
+
+    - TB6612_1.BIN2 -> STM32.PA7
+
+    - TB6612_1.AO1 -> MOTORA+
+
+    - TB6612_1.AO2 -> MOTORA-
+    
+    - TB6612_1.BO1 -> MOTORB+
+
+    - TB6612_1.BO2 -> MOTORB-
+ 
+- TB6612_2
+
+    - TB6612_2.VM  -> BATTARY.+
+
+    - TB6612_2.VCC -> STM32.3.3V
+     
+    - TB6612_2.GND -> STM32.GND
+ 
+    - TB6612_2.STBY -> STM32.PB9
+ 
+    - TB6612_2.PWMA -> STM32.PA10(TIM1_CHANNEL_3)
+ 
+    - TB6612_2.PWMB -> STM32.PA11(TIM1_CHANNEL_4)
+
+    - TB6612_2.AIN1 -> STM32.PB0
+
+    - TB6612_2.AIN2 -> STM32.PB1
+    
+    - TB6612_2.BIN1 -> STM32.PB3
+
+    - TB6612_2.BIN2 -> STM32.PB4
+
+    - TB6612_2.AO1 -> MOTORC+
+
+    - TB6612_2.AO2 -> MOTORC-
+    
+    - TB6612_2.BO1 -> MOTORD+
+
+    - TB6612_2.BO2 -> MOTORD-
+
+- 电池电压读取
+
+    - BATTARY.+  ------ 10k电阻 ------STM32.PA1（ADC_IN1）
+ 
+    - BATTARY.-  ------ 10k电阻 ------STM32.GND
+
 
 
