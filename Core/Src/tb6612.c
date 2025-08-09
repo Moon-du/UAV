@@ -37,9 +37,9 @@
 #define PWMD_TIM   &htim1
 #define PWMD_CH    TIM_CHANNEL_4    /* PA11 */
 #define DIN1_Port  GPIOB
-#define DIN1_Pin   GPIO_PIN_2
+#define DIN1_Pin   GPIO_PIN_3
 #define DIN2_Port  GPIOB
-#define DIN2_Pin   GPIO_PIN_3
+#define DIN2_Pin   GPIO_PIN_4
 
 #define MAX_SPEED   100
 #define MIN_SPEED   0
@@ -126,3 +126,4 @@ void TB6612_Coast(MotorId id)
 {
     TB6612_SetMotor(id, DIR_STOP, MIN_SPEED);     /* PWM=0，方向脚为低 -> 滑行 */
 }
+
