@@ -50,7 +50,85 @@
     - JDY23.RX -> STM32.PA2(USART2_TX)
 
     - JDY23.TX -> STM32.PA3(USART2_RX)
-      
+ 
+- DRV8871_1
+
+    - DRV8871_1.VM  -> BATTARY.+
+
+    - DRV8871_1.VCC -> STM32.3.3V
+     
+    - DRV8871_1.GND -> STM32.GND
+ 
+    - DRV8871_1.EP -> STM32.PA8(TIM1_CHANNEL_1)
+
+    - DRV8871_1.IN1 -> STM32.PA4
+
+    - DRV8871_1.IN2 -> STM32.PA5
+    
+    - DRV8871_1.OUT1 -> MOTORA+
+
+    - DRV8871_1.OUT2 -> MOTORA-
+
+ - DRV8871_2
+
+    - DRV8871_1.VM  -> BATTARY.+
+
+    - DRV8871_1.VCC -> STM32.3.3V
+     
+    - DRV8871_1.GND -> STM32.GND
+ 
+    - DRV8871_1.EP -> STM32.PA9(TIM1_CHANNEL_2)
+
+    - DRV8871_1.IN1 -> STM32.PA6
+
+    - DRV8871_1.IN2 -> STM32.PA7
+    
+    - DRV8871_1.OUT1 -> MOTORA+
+
+    - DRV8871_1.OUT2 -> MOTORA-
+
+- DRV8871_3
+
+    - DRV8871_1.VM  -> BATTARY.+
+
+    - DRV8871_1.VCC -> STM32.3.3V
+     
+    - DRV8871_1.GND -> STM32.GND
+ 
+    - DRV8871_1.EP -> STM32.PA10(TIM1_CHANNEL_3)
+
+    - DRV8871_1.IN1 -> STM32.PB0
+
+    - DRV8871_1.IN2 -> STM32.PB1
+    
+    - DRV8871_1.OUT1 -> MOTORA+
+
+    - DRV8871_1.OUT2 -> MOTORA-
+ 
+- DRV8871_4
+
+    - DRV8871_1.VM  -> BATTARY.+
+
+    - DRV8871_1.VCC -> STM32.3.3V
+     
+    - DRV8871_1.GND -> STM32.GND
+ 
+    - DRV8871_1.EP -> STM32.PA11(TIM1_CHANNEL_4)
+
+    - DRV8871_1.IN1 -> STM32.PB3
+
+    - DRV8871_1.IN2 -> STM32.PB4
+    
+    - DRV8871_1.OUT1 -> MOTORA+
+
+    - DRV8871_1.OUT2 -> MOTORA-
+ 
+- 电池电压读取
+
+    - BATTARY.+  ------ 10k电阻 ------STM32.PA1（ADC_IN1）
+ 
+    - BATTARY.-  ------ 10k电阻 ------STM32.GND
+
 - TB6612_1
 
     - TB6612_1.VM  -> BATTARY.+
@@ -111,11 +189,6 @@
 
     - TB6612_2.BO2 -> MOTORD-
 
-- 电池电压读取
-
-    - BATTARY.+  ------ 10k电阻 ------STM32.PA1（ADC_IN1）
- 
-    - BATTARY.-  ------ 10k电阻 ------STM32.GND
 
 
 
